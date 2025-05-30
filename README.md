@@ -125,7 +125,6 @@ Methods
 
 ```Python
 from dtransform import Spectrum
-import sympy as sp
 
 
 # Define symbolic expressions and expansion center
