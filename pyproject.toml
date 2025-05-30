@@ -1,0 +1,14 @@
+[project]
+name = "dtransform"
+version = "0.1.0"
+description = "Multivariable Differential Transform Method for symbolic computation"
+readme = "README.rst"
+license = { file = "LICENSE" }
+keywords = ["dtm", "differential", "transform", "spectrum", "differential transform"]
+authors = [{ name = "Vladimir Poghosyan", email = "vlad.jit@gmail.com" }]
+dependencies = ["sympy >= 1.12"]
+requires-python = ">=3.10"
+
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
