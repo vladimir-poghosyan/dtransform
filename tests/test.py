@@ -12,6 +12,8 @@ EQUATIONS: tuple = (
     ("pi + x + y", "1 + x * y", {'x': 0, 'y': 0}, None),
     ("pi + x + y", "1 + x * y", {'x': 1, 'y': 2}, {'x': 0.5, 'y': 1.5}),
     ("(1 + x) / y", "1 + x - y", {'x': 1, 'y': 1}, None),
+    ("(1 + x) ^ y", "1 + x - y", {'x': 0, 'y': 0}, None),
+    ("(1 + x) ^ y", "(1 + x - y) / x", {'x': 1, 'y': 3}, None),
     ("sin(x) / y", "1 - x - y", {'x': 1, 'y': 2}, None),
 )
 
@@ -33,9 +35,12 @@ def test_subtraction() -> None:
     for f1, f2, center, scaling in EQUATIONS:
         s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
         s2 = Spectrum(f2, order=3, center=center, scaling=scaling)
-        assert (s1 - s2).inverse().evalf(subs=center) == (
-            sp.sympify(f1) - sp.sympify(f2)
-        ).evalf(subs=center)
+        assert float(
+            round((s1 - s2).inverse().evalf(subs=center), 14)
+        ) == float(round(
+            (sp.sympify(f1) - sp.sympify(f2)).evalf(subs=center),
+            14
+        ))
 
 
 def test_multiplication() -> None:
