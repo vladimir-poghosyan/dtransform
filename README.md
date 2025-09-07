@@ -159,11 +159,12 @@ Reconstructed Quotient: 4*x**3*y**3/729 - 5*x**3*y**2/243 - 32*x**3*y/243 + 112*
 
 1. **Pukhov, A. A.**, Differential Transformation Method and Its Application in Mechanics and Control Theory. Moscow State University, 1971. (in Russian)
 2. **Zhou, J. K.**, Differential Transformation and Its Applications for Electrical Circuits. Huazhong University Press, 1986.
-3. **Simonyan S. H., Avetisyan A. G.**, Applied theory of differential transforms. Chartaraget, Yereva, 2010.
-4. **Bervillier C.**, Status of the differential transformation method. Universit´e Fran¸cois Rabelais, 2012.
-5. **Abdel-Halim Hassan**, Application to differential transformation method for solving systems of differential equations.  Zagazig Universit, 2007.
-6. **Arikoglu, A. and Ozkol, I.**, Solution of differential-difference equations by using differential transform method, Applied Mathematics and Computation, 2005.
-7. **Hassan, I. H.**, Comparison between differential transformation method and Adomian decomposition method, Applied Mathematics and Computation, 2008.
+3. **Simonyan S. H., Avetisyan A. G.**, Applied theory of differential transforms. Chartaraget, Yerevan, 2010.
+4. **Poghosyan V. A., Avetisyan A. G.**, The multidimensional differential analog of Berkowitz’s algorithm. Proceedings of the RA National Academy of Science and NPUA, Yerevan, 2017.
+5. **Bervillier C.**, Status of the differential transformation method. Universit´e Fran¸cois Rabelais, 2012.
+6. **Abdel-Halim Hassan**, Application to differential transformation method for solving systems of differential equations.  Zagazig Universit, 2007.
+7. **Arikoglu, A. and Ozkol, I.**, Solution of differential-difference equations by using differential transform method, Applied Mathematics and Computation, 2005.
+8. **Hassan, I. H.**, Comparison between differential transformation method and Adomian decomposition method, Applied Mathematics and Computation, 2008.
 
 ## 📄 License
 
