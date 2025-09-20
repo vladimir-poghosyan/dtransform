@@ -37,7 +37,7 @@ class Spectrum:
         ))
 
         # populate values or use defaults for center and scaling
-        _center = center or {}
+        _center = (center or {}) | kwargs
         _scaling = scaling or {}
 
         for var in self.__variables:
