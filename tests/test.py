@@ -26,7 +26,7 @@ def test_addition() -> None:
 
     for f1, f2, center, scaling in EQUATIONS:
         s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
-        s2 = Spectrum(f2, order=3, center=center, scaling=scaling)
+        s2 = Spectrum(f2, order=3, scaling=scaling, **center)
         assert (s1 + s2).inverse().evalf(subs=center) == (
             sp.sympify(f1) + sp.sympify(f2)
         ).evalf(subs=center)
@@ -37,7 +37,7 @@ def test_subtraction() -> None:
 
     for f1, f2, center, scaling in EQUATIONS:
         s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
-        s2 = Spectrum(f2, order=3, center=center, scaling=scaling)
+        s2 = Spectrum(f2, order=3, scaling=scaling, **center)
         assert float(
             round((s1 - s2).inverse().evalf(subs=center), 14)
         ) == float(round(
@@ -51,7 +51,7 @@ def test_multiplication() -> None:
 
     for f1, f2, center, scaling in EQUATIONS:
         s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
-        s2 = Spectrum(f2, order=3, center=center, scaling=scaling)
+        s2 = Spectrum(f2, order=3, scaling=scaling, **center)
         assert (s1 * s2).inverse().evalf(subs=center) == (
             sp.sympify(f1) * sp.sympify(f2)
         ).evalf(subs=center)
@@ -62,7 +62,7 @@ def test_scalar_multiplication() -> None:
 
     for f1, f2, center, scaling in EQUATIONS:
         s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
-        s2 = Spectrum(f2, order=3, center=center, scaling=scaling)
+        s2 = Spectrum(f2, order=3, scaling=scaling, **center)
 
         scalar = randint(2, 9)
 
@@ -80,7 +80,7 @@ def test_division() -> None:
 
     for f1, f2, center, scaling in EQUATIONS:
         s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
-        s2 = Spectrum(f2, order=3, center=center, scaling=scaling)
+        s2 = Spectrum(f2, order=3, scaling=scaling, **center)
 
         assert round((s1 / s2).inverse().evalf(subs=center), 14) == round(
             (sp.sympify(f1) / sp.sympify(f2)).evalf(subs=center),
@@ -93,7 +93,7 @@ def test_scalar_division() -> None:
 
     for f1, f2, center, scaling in EQUATIONS:
         s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
-        s2 = Spectrum(f2, order=3, center=center, scaling=scaling)
+        s2 = Spectrum(f2, order=3, scaling=scaling, **center)
 
         scalar = randint(2, 9)
 
