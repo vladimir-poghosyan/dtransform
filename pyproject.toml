@@ -2,8 +2,8 @@
 name = "dtransform"
 version = "0.1.0"
 description = "Multivariable Differential Transform Method for symbolic computation"
-readme = "README.rst"
-license = { file = "LICENSE" }
+readme = "README.md"
+license = "MIT"
 keywords = ["dtm", "differential", "transform", "spectrum", "differential transform"]
 authors = [{ name = "Vladimir Poghosyan", email = "vlad.jit@gmail.com" }]
 dependencies = ["sympy >= 1.12"]
