@@ -1,106 +1,105 @@
+import unittest
+
 from random import randint
 
 import sympy as sp
+
 from dtransform import Spectrum
 
 
-EQUATIONS: tuple = (
-    ("x + y", "1 + x * y", {'x': 1, 'y': 2}, None),
-    ("2 + x + 3 * y", "1 + x * y", {'x': 1, 'y': 2}, None),
-    ("2 + x + y", "1 + x * y", {'x': 1, 'y': 2}, None),
-    ("pi + x + y", "1 + x * y", {'x': 1, 'y': 2}, None),
-    ("pi + x + y", "1 + x * y", {'x': 0, 'y': 0}, None),
-    ("pi + x + y", "1 + x * y", {'x': 1, 'y': 2}, {'x': 0.5, 'y': 1.5}),
-    ("(1 + x) / y", "1 + x - y", {'x': 1, 'y': 1}, None),
-    ("(1 + x) ^ y", "1 + x - y", {'x': 0, 'y': 0}, None),
-    ("(1 + x) ^ y", "(1 + x - y) / x", {'x': 1, 'y': 3}, None),
-    ("sin(x) / y", "1 - x - y", {'x': 1, 'y': 2}, None),
-    ("x + y ^ 2 + 1", "x * y ^ 2 - 2 * x", {'x': 1, 'y': 2}, None),
-    ("exp(x) / (1 - y)", "log(x) + 2 ^ y", {'x': 1, 'y': 2}, None),
-    ("2 * t ^ 2 + t ^ 3", "t ^ 3", {'t': 2}, None),
-)
+class TestDTransform(unittest.TestCase):
 
+    EQUATIONS: tuple = (
+        ("x + y", "1 + x * y", {'x': 1, 'y': 2}, None),
+        ("2 + x + 3 * y", "1 + x * y", {'x': 1, 'y': 2}, None),
+        ("2 + x + y", "1 + x * y", {'x': 1, 'y': 2}, None),
+        ("pi + x + y", "1 + x * y", {'x': 1, 'y': 2}, None),
+        ("pi + x + y", "1 + x * y", {'x': 0, 'y': 0}, None),
+        ("pi + x + y", "1 + x * y", {'x': 1, 'y': 2}, {'x': 0.5, 'y': 1.5}),
+        ("(1 + x) / y", "1 + x - y", {'x': 1, 'y': 1}, None),
+        ("(1 + x) ^ y", "1 + x - y", {'x': 0, 'y': 0}, None),
+        ("(1 + x) ^ y", "(1 + x - y) / x", {'x': 1, 'y': 3}, None),
+        ("sin(x) / y", "1 - x - y", {'x': 1, 'y': 2}, None),
+        ("x + y ^ 2 + 1", "x * y ^ 2 - 2 * x", {'x': 1, 'y': 2}, None),
+        ("exp(x) / (1 - y)", "log(x) + 2 ^ y", {'x': 1, 'y': 2}, None),
+        ("2 * t ^ 2 + t ^ 3", "t ^ 3", {'t': 2}, None),
+        (
+            "5 + α - 2 * ω^2 + I * ω * (2 + β)",
+            "-2 - α - I * ω * (1 + β)",
+            {'α': 2, 'β': 3, 'ω': 14},
+            None
+        ),
+    )
 
-def test_addition() -> None:
-    global EQUATIONS
+    def test_addition(self) -> None:
+        for f1, f2, center, scaling in TestDTransform.EQUATIONS:
+            s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
+            s2 = Spectrum(f2, order=3, scaling=scaling, **center)
 
-    for f1, f2, center, scaling in EQUATIONS:
-        s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
-        s2 = Spectrum(f2, order=3, scaling=scaling, **center)
-        assert (s1 + s2).inverse().evalf(subs=center) == (
-            sp.sympify(f1) + sp.sympify(f2)
-        ).evalf(subs=center)
+            assert (s1 + s2).inverse().evalf(subs=center) == (
+                sp.sympify(f1) + sp.sympify(f2)
+            ).evalf(subs=center)
 
+    def test_subtraction(self) -> None:
+        for f1, f2, center, scaling in TestDTransform.EQUATIONS:
+            s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
+            s2 = Spectrum(f2, order=3, scaling=scaling, **center)
 
-def test_subtraction() -> None:
-    global EQUATIONS
+            assert round(
+                (s1 - s2).inverse().evalf(subs=center),
+                14
+            ).equals(
+                round(
+                    (sp.sympify(f1) - sp.sympify(f2)).evalf(subs=center),
+                    14
+                )
+            )
 
-    for f1, f2, center, scaling in EQUATIONS:
-        s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
-        s2 = Spectrum(f2, order=3, scaling=scaling, **center)
-        assert float(
-            round((s1 - s2).inverse().evalf(subs=center), 14)
-        ) == float(round(
-            (sp.sympify(f1) - sp.sympify(f2)).evalf(subs=center),
-            14
-        ))
+    def test_multiplication(self) -> None:
+        for f1, f2, center, scaling in TestDTransform.EQUATIONS:
+            s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
+            s2 = Spectrum(f2, order=3, scaling=scaling, **center)
 
+            assert (s1 * s2).inverse().evalf(subs=center) == (
+                sp.sympify(f1) * sp.sympify(f2)
+            ).evalf(subs=center)
 
-def test_multiplication() -> None:
-    global EQUATIONS
+    def test_scalar_multiplication(self) -> None:
+        for f1, f2, center, scaling in TestDTransform.EQUATIONS:
+            s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
+            s2 = Spectrum(f2, order=3, scaling=scaling, **center)
 
-    for f1, f2, center, scaling in EQUATIONS:
-        s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
-        s2 = Spectrum(f2, order=3, scaling=scaling, **center)
-        assert (s1 * s2).inverse().evalf(subs=center) == (
-            sp.sympify(f1) * sp.sympify(f2)
-        ).evalf(subs=center)
+            scalar = randint(2, 9)
 
+            assert (scalar * s1).inverse().evalf(subs=center) == (
+                scalar * sp.sympify(f1)
+            ).evalf(subs=center)
 
-def test_scalar_multiplication() -> None:
-    global EQUATIONS
+            assert (scalar * s2).inverse().evalf(subs=center) == (
+                scalar * sp.sympify(f2)
+            ).evalf(subs=center)
 
-    for f1, f2, center, scaling in EQUATIONS:
-        s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
-        s2 = Spectrum(f2, order=3, scaling=scaling, **center)
+    def test_division(self) -> None:
+        for f1, f2, center, scaling in TestDTransform.EQUATIONS:
+            s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
+            s2 = Spectrum(f2, order=3, scaling=scaling, **center)
 
-        scalar = randint(2, 9)
+            assert round((s1 / s2).inverse().evalf(subs=center), 14) == round(
+                (sp.sympify(f1) / sp.sympify(f2)).evalf(subs=center),
+                14
+            )
 
-        assert (scalar * s1).inverse().evalf(subs=center) == (
-            scalar * sp.sympify(f1)
-        ).evalf(subs=center)
+    def test_scalar_division(self) -> None:
+        for f1, f2, center, scaling in TestDTransform.EQUATIONS:
+            s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
+            s2 = Spectrum(f2, order=3, scaling=scaling, **center)
 
-        assert (scalar * s2).inverse().evalf(subs=center) == (
-            scalar * sp.sympify(f2)
-        ).evalf(subs=center)
+            scalar = randint(2, 9)
 
+            assert (s1 / scalar).inverse().evalf(subs=center) == (
+                sp.sympify(f1) / scalar
+            ).evalf(subs=center)
 
-def test_division() -> None:
-    global EQUATIONS
-
-    for f1, f2, center, scaling in EQUATIONS:
-        s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
-        s2 = Spectrum(f2, order=3, scaling=scaling, **center)
-
-        assert round((s1 / s2).inverse().evalf(subs=center), 14) == round(
-            (sp.sympify(f1) / sp.sympify(f2)).evalf(subs=center),
-            14
-        )
-
-
-def test_scalar_division() -> None:
-    global EQUATIONS
-
-    for f1, f2, center, scaling in EQUATIONS:
-        s1 = Spectrum(f1, order=3, center=center, scaling=scaling)
-        s2 = Spectrum(f2, order=3, scaling=scaling, **center)
-
-        scalar = randint(2, 9)
-
-        assert (s1 / scalar).inverse().evalf(subs=center) == (
-            sp.sympify(f1) / scalar
-        ).evalf(subs=center)
-
-        assert (s2 / scalar).inverse().evalf(subs=center) == (
-            sp.sympify(f2) / scalar
-        ).evalf(subs=center)
+            assert (s2 / scalar).inverse().evalf(subs=center) == (
+                sp.sympify(f2) / scalar
+            ).evalf(subs=center)
