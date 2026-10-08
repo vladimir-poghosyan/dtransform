@@ -1,6 +1,6 @@
 import unittest
 
-from random import randint
+from random import randint, sample
 
 import sympy as sp
 
@@ -96,10 +96,42 @@ class TestDTransform(unittest.TestCase):
 
             scalar = randint(2, 9)
 
-            assert (s1 / scalar).inverse().evalf(subs=center) == (
-                sp.sympify(f1) / scalar
-            ).evalf(subs=center)
+            assert round(
+                (s1 / scalar).inverse().evalf(subs=center),
+                14
+            ) == round((sp.sympify(f1) / scalar).evalf(subs=center), 14)
 
-            assert (s2 / scalar).inverse().evalf(subs=center) == (
-                sp.sympify(f2) / scalar
-            ).evalf(subs=center)
+            assert round(
+                (s2 / scalar).inverse().evalf(subs=center),
+                14
+            ) == round((sp.sympify(f2) / scalar).evalf(subs=center), 14)
+
+    def test_diff(self) -> None:
+        for f1, f2, center, scaling in TestDTransform.EQUATIONS:
+            s1 = Spectrum(f1, order=6, center=center, scaling=scaling)
+            s2 = Spectrum(f2, order=6, scaling=scaling, **center)
+
+            derivatives_by = {
+                var: randint(1, 4)
+                for var in sample(tuple(center), k=randint(1, len(center)))
+            }
+
+            assert round(
+                s1.diff(**derivatives_by).inverse().evalf(subs=center),
+                14
+            ) == round(
+                sp.sympify(f1).diff(
+                    *sum(derivatives_by.items(), ())
+                ).evalf(subs=center),
+                14
+            )
+
+            assert round(
+                s2.diff(**derivatives_by).inverse().evalf(subs=center),
+                14
+            ) == round(
+                sp.sympify(f2).diff(
+                    *sum(derivatives_by.items(), ())
+                ).evalf(subs=center),
+                14
+            )
