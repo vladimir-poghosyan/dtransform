@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 from itertools import product
-from typing import Union
 
 import sympy as sp
 
@@ -13,7 +14,6 @@ class Spectrum:
         '__scaling',
         '__coeffs',
         '__variables',
-        '__order_prod',
     )
 
     def __init__(
@@ -108,7 +108,7 @@ class Spectrum:
 
         return sp.simplify(reconstructed)
 
-    def clone(self) -> 'Spectrum':
+    def clone(self) -> Spectrum:
         new = object.__new__(Spectrum)
         new.__expr = self.__expr
         new.__order = self.__order
@@ -124,7 +124,7 @@ class Spectrum:
         for idx, val in sorted(self.coeffs.items()):
             print(f"Spectrum[{idx}] = {val}")
 
-    def _check_compatibility(self, other: 'Spectrum') -> None:
+    def _check_compatibility(self, other: Spectrum) -> None:
         if self.__variables != other.variables:
             raise ValueError("Variables do not match.")
         if self.__order != other.order:
@@ -133,6 +133,65 @@ class Spectrum:
             raise ValueError("Scaling constants mismatch.")
         if self.__center != other.center:
             raise ValueError("Expansion center mismatch.")
+
+    def diff(self, variable: str | None = None, /, **orders: int) -> Spectrum:
+        if variable is not None:
+            if orders:
+                raise TypeError(
+                    "Can't combine positional and keyword arguments."
+                )
+
+            orders = {variable: 1}
+
+        if not orders:
+            raise TypeError(
+                "Specify at least one variable to differentiate with respect "
+                "to."
+            )
+
+        beta: list = []
+        known: set = set()
+
+        for var in self.__variables:
+            name = str(var)
+            known.add(name)
+
+            order = orders.get(name, 0)
+
+            if not isinstance(order, int) or order < 0:
+                raise ValueError(
+                    f"Differentiation order for '{name}' "
+                    "must be a non-negative integer."
+                )
+
+            beta.append(order)
+
+        if unknown := (set(orders) - known):
+            raise ValueError(
+                f"Unknown variable(s): {', '.join(sorted(unknown))}."
+            )
+
+        new: Spectrum = self.clone()
+        coeffs: dict = {}
+
+        for alpha in product(*[range(self.__order)] * len(self.__variables)):
+            source = tuple(a + b for a, b in zip(alpha, beta))
+
+            # The required coefficient is outside the available spectrum.
+            if any(i >= self.__order for i in source):
+                coeffs[alpha] = 0
+                continue
+
+            factor = 1
+
+            for var, a, b in zip(self.__variables, alpha, beta):
+                for k in range(1, b + 1):
+                    factor *= (a + k) / self.__scaling[var]
+
+            coeffs[alpha] = factor * self.__coeffs[source]
+
+        new.__coeffs = coeffs
+        return new
 
     def __repr__(self) -> str:
         return (
@@ -152,12 +211,12 @@ class Spectrum:
             and self.__coeffs == other.coeffs
         )
 
-    def __neg__(self) -> 'Spectrum':
+    def __neg__(self) -> Spectrum:
         new = self.clone()
         new.__coeffs = {k: -v for k, v in self.__coeffs.items()}
         return new
 
-    def __add__(self, other: 'Spectrum') -> 'Spectrum':
+    def __add__(self, other: Spectrum) -> Spectrum:
         self._check_compatibility(other)
 
         new = self.clone()
@@ -168,7 +227,7 @@ class Spectrum:
 
         return new
 
-    def __sub__(self, other: 'Spectrum') -> 'Spectrum':
+    def __sub__(self, other: Spectrum) -> Spectrum:
         self._check_compatibility(other)
 
         new = self.clone()
@@ -179,10 +238,7 @@ class Spectrum:
 
         return new
 
-    def __mul__(
-        self,
-        other: Union['Spectrum', int, float, sp.Basic]
-    ) -> 'Spectrum':
+    def __mul__(self, other: Spectrum | int | float | sp.Basic) -> Spectrum:
         if isinstance(other, Spectrum):
             self._check_compatibility(other)
 
@@ -211,16 +267,13 @@ class Spectrum:
                 f'"Spectrum" can\'t be multiplied by {type(other)}'
             )
 
-    def __rmul__(
-        self,
-        other: Union['Spectrum', int, float, sp.Basic]
-    ) -> 'Spectrum':
+    def __rmul__(self, other: Spectrum | int | float | sp.Basic) -> Spectrum:
         return self.__mul__(other)
 
     def __truediv__(
         self,
-        other: Union['Spectrum', int, float, sp.Basic]
-    ) -> 'Spectrum':
+        other: Spectrum | int | float | sp.Basic
+    ) -> Spectrum:
         if isinstance(other, Spectrum):
             self._check_compatibility(other)
 
